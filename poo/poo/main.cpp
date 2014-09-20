@@ -1,16 +1,22 @@
 #include <iostream>
-#include <GL\glew.h>
-#include <GL\freeglut.h>
-#include <stdio.h>
-using namespace std;
+#include <GL/glew.h>
+#include <GL/freeglut.h>
+#include <cstdio>
+#include <string>
+#include <sstream>
+#include <fstream>
+//using namespace std;
 
 #define BUFFER_OFFSET(i) ((char *) NULL + (i))
-GLuint shaderProgramID;
-GLuint vao = 0;
-GLuint vbo;
-GLuint positionID, colorID;
 
-static char* readFile(const char* filename) { 
+std::string readFile(const char* filename) {
+    std::stringstream ss;
+    std::fstream f(filename);
+    ss << f.rdbuf();
+    return ss.str();
+}
+
+/*static char* readFile(const char* filename) { 
 	FILE* fp = fopen(filename,"r");
 	fseek(fp, 0, SEEK_END);
 	long file_length = ftell(fp);
@@ -23,9 +29,7 @@ static char* readFile(const char* filename) {
 	contents[file_length+1] = '\0';
 	return contents;
 }
-
-
-
+*/
 GLuint makeVertexShader(const char* shaderSource) {
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource (vertexShaderID, 1, (const GLchar**)&shaderSource, NULL);
@@ -48,12 +52,10 @@ GLuint makeShaderProgram (GLuint vertexShaderID, GLuint fragmentShaderID) {
 	return shaderID;
 }
 
-// window resizing
 void changeViewport(int w, int h) {
 		glViewport(0,0,w,h);
 }
 
-// redraw
 void render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0 , 3);
@@ -62,6 +64,7 @@ void render() {
 
 int main (int argc, char** argv)
 {
+	glewExperimental = GL_TRUE;
 	glutInit(&argc,argv);
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
 	glutInitWindowSize(800,600);
@@ -71,7 +74,7 @@ int main (int argc, char** argv)
 
 	GLenum err = glewInit();
 	if (GLEW_OK != err) {
-		cout << "shish";
+		std::cout << "shish";
 		return 1;
 	}
 
@@ -83,20 +86,25 @@ int main (int argc, char** argv)
 			0.0f, 0.0f, 1.0f, 1.0f};
 
 
-	char* vertexShaderSourceCode = readFile("vertexShader.vsh");
-	char* fragmentShaderSourceCode = readFile("fragmentShader.fsh");
-	GLuint vertexShaderID = makeVertexShader(vertexShaderSourceCode);
-	GLuint fragmentShaderID = makeFragmentShader(fragmentShaderSourceCode);
-	shaderProgramID = makeShaderProgram(vertexShaderID, fragmentShaderID);
+	std::string vertexShaderSourceCode = readFile("vertexShader.vsh");
+	std::string fragmentShaderSourceCode = readFile("fragmentShader.fsh");
+	GLuint vertexShaderID = makeVertexShader(vertexShaderSourceCode.c_str());
+	GLuint fragmentShaderID = makeFragmentShader(fragmentShaderSourceCode.c_str());
+	GLuint shaderProgramID = makeShaderProgram(vertexShaderID, fragmentShaderID);
 
 	printf("vertexShaderID is %d\n", vertexShaderID);
 	printf("fragmentShaderID is %d\n", fragmentShaderID);
 	printf("shaderProgramID is %d\n", shaderProgramID);
-	//glDeleteProgram(shaderProgramID);
+	printf("vertexCode is %s\n", vertexShaderSourceCode);
+	
+	GLuint vao = 0;
+	GLuint vbo;
+	GLuint positionID, colorID;
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
+	// you can probably simplify your glBufferData/glBufferSubData by using sizeof vertices and sizeof colors instead of manually calculating it
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, 7*3*sizeof(GLfloat), NULL, GL_STATIC_DRAW);

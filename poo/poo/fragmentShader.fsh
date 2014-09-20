@@ -1,5 +1,6 @@
-out vec s_vColor;
+#version 130
+out vec4 s_vColor;
 
 void main () {
-	fColor = vec4 (1.0, 0.0, 0.0, 1.0);
+	s_vColor = vec4(1,0,0,1);
 }
