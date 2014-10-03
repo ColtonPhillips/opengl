@@ -63,11 +63,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="InitShader.cpp" />
+    <ClCompile Include="lazy_old_main.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragmentShader.fsh" />
+    <None Include="fshader53.glsl" />
     <None Include="vertexShader.vsh" />
+    <None Include="vshader53.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Angel.h" />
+    <ClInclude Include="mat.h" />
+    <ClInclude Include="vec.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

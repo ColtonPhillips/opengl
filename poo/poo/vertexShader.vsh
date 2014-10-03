@@ -1,7 +1,7 @@
-in vec4 s_vPosition;
-in vec4 s_vColor;
+in vec4 position;
+in vec4 pixelColor;
 out vec4 color;
 void main () {
-	color = s_vColor;
-	gl_Position = s_vPosition;
+	color = pixelColor;
+	gl_Position = position;
 }
