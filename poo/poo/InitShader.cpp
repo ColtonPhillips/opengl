@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <stdexcept>
 namespace Angel {
 
 // Create a NULL-terminated string by reading the provided file
@@ -37,66 +38,64 @@ static char* readShaderSource2(const char* filename) {
 		contents[i] = 0;
 	}
 	fread (contents, 1, file_length, fp);
-	contents[file_length+1] = '\0';
+	contents[file_length] = '\0';
+	fclose(fp);
 	return contents;
 }
 
-static char*
+std::string
 readFile(const char* filename) {
     std::stringstream ss;
     std::fstream f(filename);
     ss << f.rdbuf();
-	std::string welp = ss.str();
-	std::vector<char> buffer(welp.length() + 1, '\0');
-	std::copy(welp.begin(), welp.end(), buffer.begin());
-	return &buffer[0];
+	return ss.str();
 }
 
+static std::string readFile2(const std::string& filename){
+    std::ifstream file(filename);
+    if (!file) { throw std::runtime_error("failed to open " + filename); }
+    std::stringstream ss;
+    ss << file.rdbuf();
+    return ss.str();
+}
 
 // Create a GLSL program object from vertex and fragment shader files
 GLuint
 InitShader(const char* vShaderFile, const char* fShaderFile)
 {
-    struct Shader {
-	const char*  filename;
-	GLenum       type;
-	GLchar*      source;
-    }  shaders[2] = {
-	{ vShaderFile, GL_VERTEX_SHADER, NULL },
-	{ fShaderFile, GL_FRAGMENT_SHADER, NULL }
-    };
+	std::string sources[2] = { readFile2(vShaderFile), readFile2(fShaderFile) };
+	GLenum types[2] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
 
     GLuint program = glCreateProgram();
     
     for ( int i = 0; i < 2; ++i ) {
-	Shader& s = shaders[i];
-	s.source = readShaderSource2( s.filename );
-	if ( shaders[i].source == NULL ) {
-	    std::cerr << "Failed to read " << s.filename << std::endl;
-	    exit( EXIT_FAILURE );
-	}
+		if ( sources[i].c_str() == NULL ) {
+			std::cerr << "Failed to read " << i << std::endl;
+			exit( EXIT_FAILURE );
+		}
 
-	GLuint shader = glCreateShader( s.type );
-	glShaderSource( shader, 1, (const GLchar**) &s.source, NULL );
-	glCompileShader( shader );
+		GLuint shader = glCreateShader( types[i] );
+		const char *src = sources[i].c_str();
+		glShaderSource( shader, 1, (const GLchar**) &src, NULL );
+		glCompileShader( shader );
 
-	GLint  compiled;
-	glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
-	if ( !compiled ) {
-	    std::cerr << s.filename << " failed to compile:" << std::endl;
-	    GLint  logSize;
-	    glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &logSize );
-	    char* logMsg = new char[logSize];
-	    glGetShaderInfoLog( shader, logSize, NULL, logMsg );
-	    std::cerr << logMsg << std::endl;
-	    delete [] logMsg;
+		GLint  compiled;
+		glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
+		if ( !compiled ) {
+			std::cerr << " failed to compile:" << std::endl;
+			GLint  logSize;
+			glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &logSize );
+			char* logMsg = new char[logSize];
+			glGetShaderInfoLog( shader, logSize, NULL, logMsg );
+			std::cerr << logMsg << std::endl;
+			delete [] logMsg;
 
-	    exit( EXIT_FAILURE );
-	}
+			exit( EXIT_FAILURE );
+		}
 
-	delete [] s.source;
+		//delete [] s.source;
 
-	glAttachShader( program, shader );
+		glAttachShader( program, shader );
     }
 
     /* link  and error check */
