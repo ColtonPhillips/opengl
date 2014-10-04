@@ -1,6 +1,9 @@
 
 #include "Angel.h"
-
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <vector>
 namespace Angel {
 
 // Create a NULL-terminated string by reading the provided file
@@ -24,6 +27,31 @@ readShaderSource(const char* shaderFile)
     return buf;
 }
 
+static char* readShaderSource2(const char* filename) { 
+	FILE* fp = fopen(filename,"r");
+	fseek(fp, 0, SEEK_END);
+	long file_length = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	char* contents = new char[file_length+1];
+	for (int i = 0; i < file_length+1;i++) {
+		contents[i] = 0;
+	}
+	fread (contents, 1, file_length, fp);
+	contents[file_length+1] = '\0';
+	return contents;
+}
+
+static char*
+readFile(const char* filename) {
+    std::stringstream ss;
+    std::fstream f(filename);
+    ss << f.rdbuf();
+	std::string welp = ss.str();
+	std::vector<char> buffer(welp.length() + 1, '\0');
+	std::copy(welp.begin(), welp.end(), buffer.begin());
+	return &buffer[0];
+}
+
 
 // Create a GLSL program object from vertex and fragment shader files
 GLuint
@@ -42,7 +70,7 @@ InitShader(const char* vShaderFile, const char* fShaderFile)
     
     for ( int i = 0; i < 2; ++i ) {
 	Shader& s = shaders[i];
-	s.source = readShaderSource( s.filename );
+	s.source = readShaderSource2( s.filename );
 	if ( shaders[i].source == NULL ) {
 	    std::cerr << "Failed to read " << s.filename << std::endl;
 	    exit( EXIT_FAILURE );

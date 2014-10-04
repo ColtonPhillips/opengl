@@ -82,6 +82,10 @@ init()
 {
     colorcube();
 
+	glewExperimental = GL_TRUE;
+	glewInit();
+	
+
     // Create a vertex array object
     GLuint vao = 0;
     glGenVertexArrays( 1, &vao );
