@@ -7,6 +7,7 @@
 #include <stdexcept>
 namespace Angel {
 
+	/*
 // Create a NULL-terminated string by reading the provided file
 static char*
 readShaderSource(const char* shaderFile)
@@ -50,8 +51,9 @@ readFile(const char* filename) {
     ss << f.rdbuf();
 	return ss.str();
 }
+*/
 
-static std::string readFile2(const std::string& filename){
+static std::string readSource(const std::string& filename){
     std::ifstream file(filename);
     if (!file) { throw std::runtime_error("failed to open " + filename); }
     std::stringstream ss;
@@ -63,7 +65,7 @@ static std::string readFile2(const std::string& filename){
 GLuint
 InitShader(const char* vShaderFile, const char* fShaderFile)
 {
-	std::string sources[2] = { readFile2(vShaderFile), readFile2(fShaderFile) };
+	std::string sources[2] = { readSource(vShaderFile), readSource(fShaderFile) };
 	GLenum types[2] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
 
     GLuint program = glCreateProgram();
@@ -89,11 +91,8 @@ InitShader(const char* vShaderFile, const char* fShaderFile)
 			glGetShaderInfoLog( shader, logSize, NULL, logMsg );
 			std::cerr << logMsg << std::endl;
 			delete [] logMsg;
-
 			exit( EXIT_FAILURE );
 		}
-
-		//delete [] s.source;
 
 		glAttachShader( program, shader );
     }
@@ -104,15 +103,14 @@ InitShader(const char* vShaderFile, const char* fShaderFile)
     GLint  linked;
     glGetProgramiv( program, GL_LINK_STATUS, &linked );
     if ( !linked ) {
-	std::cerr << "Shader program failed to link" << std::endl;
-	GLint  logSize;
-	glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logSize);
-	char* logMsg = new char[logSize];
-	glGetProgramInfoLog( program, logSize, NULL, logMsg );
-	std::cerr << logMsg << std::endl;
-	delete [] logMsg;
-
-	exit( EXIT_FAILURE );
+		std::cerr << "Shader program failed to link" << std::endl;
+		GLint  logSize;
+		glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logSize);
+		char* logMsg = new char[logSize];
+		glGetProgramInfoLog( program, logSize, NULL, logMsg );
+		std::cerr << logMsg << std::endl;
+		delete [] logMsg;
+		exit( EXIT_FAILURE );
     }
 
     /* use program object */

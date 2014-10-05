@@ -4,29 +4,20 @@
 //  Light and material properties are sent to the shader as uniform
 //    variables.  Vertex positions and normals are sent after each
 //    rotation.
-
+#include <ctime>
+#include <cstdlib>
 #include "Angel.h"
 
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
 const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
-
 point4 points[NumVertices];
 vec3   normals[NumVertices];
+point4 vertices[8];
+float spin_speed = 0.05;
 
-// Vertices of a unit cube centered at origin, sides aligned with axes
-point4 vertices[8] = {
-    point4( -0.5, -0.5,  0.5, 1.0 ),
-    point4( -0.5,  0.5,  0.5, 1.0 ),
-    point4(  0.5,  0.5,  0.5, 1.0 ),
-    point4(  0.5, -0.5,  0.5, 1.0 ),
-    point4( -0.5, -0.5, -0.5, 1.0 ),
-    point4( -0.5,  0.5, -0.5, 1.0 ),
-    point4(  0.5,  0.5, -0.5, 1.0 ),
-    point4(  0.5, -0.5, -0.5, 1.0 )
-};
-
+// Seems sorta silly of a HACK idea here? - COLTON
 // Array of rotation angles (in degrees) for each coordinate axis
 enum { Xaxis = 0, Yaxis = 1, Zaxis = 2, NumAxes = 3 };
 int      Axis = Xaxis;
@@ -35,13 +26,34 @@ GLfloat  Theta[NumAxes] = { 0.0, 0.0, 0.0 };
 // Model-view and projection matrices uniform location
 GLuint  ModelView, Projection;
 
-//----------------------------------------------------------------------------
+float random_range(float min, float max) {
+	return min + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(max-min)));
+}
 
-// quad generates two triangles for each face and assigns colors
-//    to the vertices
+// Vertices of a unit cube centered at origin, sides aligned with axes
+void init_vertices() {
 
-int Index = 0;
+	float init_ndc_cube[8][3] = {
+		{ -0.5,		-0.5,	0.5},
+		{-0.5,		0.5,	0.5},
+		{0.5,		0.5,	0.5},
+		{0.5,		-0.5,	0.5},
+		{-0.5,		-0.5,	-0.5},
+		{-0.5,		0.5,	-0.5},
+		{0.5,		0.5,	-0.5},
+		{0.5,		-0.5,	-0.5}
+	};
 
+	std::srand(std::time(0));
+	float h;
+	for (int i = 0; i < 8; i++) {
+		h = random_range(1.0,5.0);
+		vertices[i] = point4(init_ndc_cube[i][0],init_ndc_cube[i][1],init_ndc_cube[i][2],h);
+	}
+}
+
+int qIndex = 0;
+// quad generates two triangles for each face and assigns colors to the vertices
 void
 quad( int a, int b, int c, int d )
 {
@@ -49,18 +61,15 @@ quad( int a, int b, int c, int d )
     //   compute its face normal 
     vec4 u = vertices[b] - vertices[a];
     vec4 v = vertices[c] - vertices[b];
-
+	
     vec3 normal = normalize( cross(u, v) );
-
-    normals[Index] = normal; points[Index] = vertices[a]; Index++;
-    normals[Index] = normal; points[Index] = vertices[b]; Index++;
-    normals[Index] = normal; points[Index] = vertices[c]; Index++;
-    normals[Index] = normal; points[Index] = vertices[a]; Index++;
-    normals[Index] = normal; points[Index] = vertices[c]; Index++;
-    normals[Index] = normal; points[Index] = vertices[d]; Index++;
+    normals[qIndex] = normal; points[qIndex] = vertices[a]; qIndex++;
+    normals[qIndex] = normal; points[qIndex] = vertices[b]; qIndex++;
+    normals[qIndex] = normal; points[qIndex] = vertices[c]; qIndex++;
+    normals[qIndex] = normal; points[qIndex] = vertices[a]; qIndex++;
+    normals[qIndex] = normal; points[qIndex] = vertices[c]; qIndex++;
+    normals[qIndex] = normal; points[qIndex] = vertices[d]; qIndex++;
 }
-
-//----------------------------------------------------------------------------
 
 // generate 12 triangles: 36 vertices and 36 colors
 void
@@ -74,8 +83,6 @@ colorcube()
     quad( 5, 4, 0, 1 );
 }
 
-//----------------------------------------------------------------------------
-
 // OpenGL initialization
 void
 init()
@@ -84,28 +91,21 @@ init()
 
 	glewExperimental = GL_TRUE;
 	glewInit();
-	
 
-    // Create a vertex array object
     GLuint vao = 0;
     glGenVertexArrays( 1, &vao );
     glBindVertexArray( vao );
 
-    // Create and initialize a buffer object
     GLuint buffer;
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(normals),
-		  NULL, GL_STATIC_DRAW );
-    glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(points), points );
-    glBufferSubData( GL_ARRAY_BUFFER, sizeof(points),
-		     sizeof(normals), normals );
+    glBufferData( GL_ARRAY_BUFFER,		sizeof(points) + sizeof(normals), NULL, GL_STATIC_DRAW );
+    glBufferSubData( GL_ARRAY_BUFFER,	0,					sizeof(points),		points );
+    glBufferSubData( GL_ARRAY_BUFFER,	sizeof(points),		sizeof(normals),	normals );
 
-    // Load shaders and use the resulting shader program
     GLuint program = InitShader( "vshader53.glsl", "fshader53.glsl" );
     glUseProgram( program );
 
-    // set up vertex arrays
     GLuint vPosition = glGetAttribLocation( program, "vPosition" );
     glEnableVertexAttribArray( vPosition );
     glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,
@@ -116,7 +116,6 @@ init()
     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,
 			   BUFFER_OFFSET(sizeof(points)) );
 
-    // Initialize shader lighting parameters
     point4 light_position( 0.0, 0.0, -1.0, 0.0 );
     color4 light_ambient( 0.2, 0.2, 0.2, 1.0 );
     color4 light_diffuse( 1.0, 1.0, 1.0, 1.0 );
@@ -137,34 +136,31 @@ init()
 		  1, diffuse_product );
     glUniform4fv( glGetUniformLocation(program, "SpecularProduct"),
 		  1, specular_product );
-	
     glUniform4fv( glGetUniformLocation(program, "LightPosition"),
 		  1, light_position );
-
     glUniform1f( glGetUniformLocation(program, "Shininess"),
 		 material_shininess );
-		 
-    // Retrieve transformation uniform variable locations
+
     ModelView = glGetUniformLocation( program, "ModelView" );
     Projection = glGetUniformLocation( program, "Projection" );
 
     glEnable( GL_DEPTH_TEST );
 
     glShadeModel(GL_FLAT);
-
-    glClearColor( 1.0, 1.0, 1.0, 1.0 ); 
+	
+	std::srand(std::time(0));
+	float r = random_range(0.0,1.0);
+	float g = random_range(0.0,1.0);
+	float b = random_range(0.0,1.0);
+    glClearColor( r, g, b, 1.0 ); 
 }
-
-//----------------------------------------------------------------------------
 
 void
 display( void )
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //  Generate tha model-view matrixn
-
-    const vec3 viewer_pos( 0.0, 0.0, 2.0 );
+    const vec3 viewer_pos( 0.0, 0, 2.0 );
     mat4  model_view = ( Translate( -viewer_pos ) *
 			 RotateX( Theta[Xaxis] ) *
 			 RotateY( Theta[Yaxis] ) *
@@ -175,8 +171,6 @@ display( void )
     glDrawArrays( GL_TRIANGLES, 0, NumVertices );
     glutSwapBuffers();
 }
-
-//----------------------------------------------------------------------------
 
 void
 mouse( int button, int state, int x, int y )
@@ -190,12 +184,10 @@ mouse( int button, int state, int x, int y )
     }
 }
 
-//----------------------------------------------------------------------------
-
 void
 idle( void )
 {
-    Theta[Axis] += 0.01;
+    Theta[Axis] += spin_speed;
 
     if ( Theta[Axis] > 360.0 ) {
 	Theta[Axis] -= 360.0;
@@ -204,12 +196,14 @@ idle( void )
     glutPostRedisplay();
 }
 
-//----------------------------------------------------------------------------
-
 void
 keyboard( unsigned char key, int x, int y )
 {
     switch( key ) {
+	case '1': spin_speed-=0.01;
+		break;
+	case '2': spin_speed+=0.01;
+		break;
 	case 033: // Escape Key
 	case 'q': case 'Q':
 	    exit( EXIT_SUCCESS );
@@ -217,7 +211,15 @@ keyboard( unsigned char key, int x, int y )
     }
 }
 
-//----------------------------------------------------------------------------
+void
+specialInput( int key, int x, int y ) {
+	switch( key ) {
+	case GLUT_KEY_LEFT: spin_speed-=0.01;
+		break;
+	case GLUT_KEY_RIGHT: spin_speed+=0.01;
+		break;
+	}
+}
 
 void
 reshape( int width, int height )
@@ -230,11 +232,11 @@ reshape( int width, int height )
     glUniformMatrix4fv( Projection, 1, GL_TRUE, projection );
 }
 
-//----------------------------------------------------------------------------
-
 int
 main( int argc, char **argv )
 {
+	init_vertices();
+
     glutInit( &argc, argv );
     glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowSize( 512, 512 );
@@ -247,6 +249,7 @@ main( int argc, char **argv )
     glutReshapeFunc( reshape );
     glutMouseFunc( mouse );
     glutIdleFunc( idle );
+	glutSpecialFunc( specialInput );
 
     glutMainLoop();
     return 0;
