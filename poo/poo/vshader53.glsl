@@ -13,7 +13,11 @@ uniform vec4 LightPosition;
 uniform float Shininess;
 void main()
 {
-    // Transform vertex  position into eye coordinates
+	//L = normalized vector from the vertex position to the light source
+	//E = normalized vector from the position to the eye
+    //H = Half-Angle Vector
+	//N = Surface Normal
+	// Transform vertex  position into eye coordinates
     vec3 pos = (ModelView * vPosition).xyz;
     vec3 L = normalize( LightPosition.xyz - pos );
     vec3 E = normalize( -pos );

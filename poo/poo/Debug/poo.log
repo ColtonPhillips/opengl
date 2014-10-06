@@ -1,4 +1,4 @@
-﻿Build started 2014-10-05 9:00:36 PM.
+﻿Build started 2014-10-05 11:38:51 PM.
      1>Project "C:\Users\Colton\workspace\opengl\poo\poo\poo.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\poo.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -14,21 +14,28 @@
      1>c:\users\colton\workspace\opengl\poo\poo\mat.h(735): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
      1>c:\users\colton\workspace\opengl\poo\poo\mat.h(752): warning C4244: '=' : conversion from 'double' to 'GLfloat', possible loss of data
      1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(18): warning C4305: 'initializing' : truncation from 'double' to 'float'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(50): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(123): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(123): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(123): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(128): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(56): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
      1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(129): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(154): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(215): warning C4305: '-=' : truncation from 'double' to 'float'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(217): warning C4305: '+=' : truncation from 'double' to 'float'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(219): warning C4305: '-=' : truncation from 'double' to 'float'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(221): warning C4305: '+=' : truncation from 'double' to 'float'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(223): warning C4305: '-=' : truncation from 'double' to 'float'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(225): warning C4305: '+=' : truncation from 'double' to 'float'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(237): warning C4305: '-=' : truncation from 'double' to 'float'
-     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(239): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(129): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(129): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(134): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(135): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(160): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(208): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(228): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(230): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(232): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(234): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(236): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(238): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(240): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(242): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(244): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(246): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(248): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(250): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(261): warning C4305: '-=' : truncation from 'double' to 'float'
+     1>c:\users\colton\workspace\opengl\poo\poo\main.cpp(263): warning C4305: '+=' : truncation from 'double' to 'float'
        Link:
          c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Colton\workspace\opengl\poo\Debug\poo.exe" /NOLOGO /LIBPATH:C:\opengl\freeglut\lib /LIBPATH:C:\opengl\glew\lib\Release\Win32 glew32.lib freeglut.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\poo.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Colton\workspace\opengl\poo\Debug\poo.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Colton\workspace\opengl\poo\Debug\poo.lib" /MACHINE:X86 Debug\InitShader.obj
          Debug\lazy_old_main.obj
@@ -44,4 +51,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.02
+Time Elapsed 00:00:03.82

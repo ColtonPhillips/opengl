@@ -19,6 +19,12 @@ float spin_speed = 0.05;
 float frustrum_angle = 45.0;
 float frustrum_near = 0.5;
 float frustrum_far = 3.0;
+float viewer_x = 0.0;
+float viewer_y = 0.0;
+float viewer_z = 2.0;
+point4 light_position;
+GLuint program;
+float timer = 0.0;
 
 // Seems sorta silly of a HACK idea here? - COLTON
 // Array of rotation angles (in degrees) for each coordinate axis
@@ -106,7 +112,7 @@ init()
     glBufferSubData( GL_ARRAY_BUFFER,	0,					sizeof(points),		points );
     glBufferSubData( GL_ARRAY_BUFFER,	sizeof(points),		sizeof(normals),	normals );
 
-    GLuint program = InitShader( "vshader53.glsl", "fshader53.glsl" );
+    program = InitShader( "vshader53.glsl", "fshader53.glsl" );
     glUseProgram( program );
 
     GLuint vPosition = glGetAttribLocation( program, "vPosition" );
@@ -119,7 +125,7 @@ init()
     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,
 			   BUFFER_OFFSET(sizeof(points)) );
 
-    point4 light_position( 0.0, 0.0, -1.0, 0.0 );
+    light_position = point4( 0.0, 0.0, -1.0, 0.0 );
     color4 light_ambient( 0.2, 0.2, 0.2, 1.0 );
     color4 light_diffuse( 1.0, 1.0, 1.0, 1.0 );
     color4 light_specular( 1.0, 1.0, 1.0, 1.0 );
@@ -170,7 +176,7 @@ display( void )
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const vec3 viewer_pos( 0.0, 0, 2.0 );
+    const vec3 viewer_pos( viewer_x, viewer_y, viewer_z );
     mat4  model_view = ( Translate( -viewer_pos ) *
 			 RotateX( Theta[Xaxis] ) *
 			 RotateY( Theta[Yaxis] ) *
@@ -199,12 +205,19 @@ mouse( int button, int state, int x, int y )
 void
 idle( void )
 {
+	timer+=0.02;
     Theta[Axis] += spin_speed;
 
     if ( Theta[Axis] > 360.0 ) {
 	Theta[Axis] -= 360.0;
     }
-    
+
+	light_position.x = std::sin(timer);
+	light_position.y = std::sin(timer);
+    light_position.z = std::sin(timer);
+
+	glUniform4fv( glGetUniformLocation(program, "LightPosition"), 1, light_position );
+
     glutPostRedisplay();
 }
 
@@ -220,12 +233,23 @@ keyboard( unsigned char key, int x, int y )
 		break;
 	case '4': frustrum_near+=0.01;
 		break;
-	case '5': frustrum_far-=0.01;
+	case '5': frustrum_far-=0.1;
 		break;
-	case '6': frustrum_far+=0.01;
+	case '6': frustrum_far+=0.1;
+		break;
+	case '7': viewer_x-=0.1;
+		break;
+	case '8': viewer_x+=0.1;
+		break;
+	case '9': viewer_y-=0.1;
+		break;
+	case '0': viewer_y+=0.1;
+		break;
+	case 'q': viewer_z-=0.1;
+		break;
+	case 'w': viewer_z+=0.1;
 		break;
 	case 033: // Escape Key
-	case 'q': case 'Q':
 	    exit( EXIT_SUCCESS );
 	    break;
     }
