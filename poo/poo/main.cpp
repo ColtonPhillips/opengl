@@ -16,6 +16,9 @@ point4 points[NumVertices];
 vec3   normals[NumVertices];
 point4 vertices[8];
 float spin_speed = 0.05;
+float frustrum_angle = 45.0;
+float frustrum_near = 0.5;
+float frustrum_far = 3.0;
 
 // Seems sorta silly of a HACK idea here? - COLTON
 // Array of rotation angles (in degrees) for each coordinate axis
@@ -155,6 +158,13 @@ init()
     glClearColor( r, g, b, 1.0 ); 
 }
 
+void changeProjection(float angle,float znear, float zfar) {
+	
+    GLfloat aspect = GLfloat(glutGet(GLUT_WINDOW_WIDTH))/glutGet(GLUT_WINDOW_HEIGHT);
+	mat4  projection = Perspective( angle, aspect, znear, zfar );
+    glUniformMatrix4fv( Projection, 1, GL_TRUE, projection );
+}
+
 void
 display( void )
 {
@@ -167,6 +177,8 @@ display( void )
 			 RotateZ( Theta[Zaxis] ) );
     
     glUniformMatrix4fv( ModelView, 1, GL_TRUE, model_view );
+
+	changeProjection(frustrum_angle,frustrum_near,frustrum_far);
 
     glDrawArrays( GL_TRIANGLES, 0, NumVertices );
     glutSwapBuffers();
@@ -203,6 +215,14 @@ keyboard( unsigned char key, int x, int y )
 	case '1': spin_speed-=0.01;
 		break;
 	case '2': spin_speed+=0.01;
+		break;	
+	case '3': frustrum_near-=0.01;
+		break;
+	case '4': frustrum_near+=0.01;
+		break;
+	case '5': frustrum_far-=0.01;
+		break;
+	case '6': frustrum_far+=0.01;
 		break;
 	case 033: // Escape Key
 	case 'q': case 'Q':
@@ -218,6 +238,10 @@ specialInput( int key, int x, int y ) {
 		break;
 	case GLUT_KEY_RIGHT: spin_speed+=0.01;
 		break;
+	case GLUT_KEY_UP: frustrum_angle-=2.5;
+		break;
+	case GLUT_KEY_DOWN: frustrum_angle+=2.5;
+		break;
 	}
 }
 
@@ -225,11 +249,7 @@ void
 reshape( int width, int height )
 {
     glViewport( 0, 0, width, height );
-
-    GLfloat aspect = GLfloat(width)/height;
-    mat4  projection = Perspective( 45.0, aspect, 0.5, 3.0 );
-
-    glUniformMatrix4fv( Projection, 1, GL_TRUE, projection );
+   	changeProjection(frustrum_angle,frustrum_near,frustrum_far);
 }
 
 int
@@ -241,7 +261,6 @@ main( int argc, char **argv )
     glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
     glutInitWindowSize( 512, 512 );
     glutCreateWindow( "Color Cube" );
-
     init();
 
     glutDisplayFunc( display );
